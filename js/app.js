@@ -751,11 +751,12 @@ function renderInsights() {
       </button>`;
   }
 
-  /* donut: top 5 + other */
-  const MAXSEG = 5;
+  /* donut: top 6 + an overflow bucket (flagged, so it can never
+     collide with a real category the user named "other(s)") */
+  const MAXSEG = 6;
   const segs = cats.slice(0, MAXSEG);
   const restAmt = cats.slice(MAXSEG).reduce((s, c) => s + c.amt, 0);
-  if (restAmt > 0) segs.push({ name: "other", icon: "banknote", color: "#64748b", amt: restAmt });
+  if (restAmt > 0) segs.push({ name: "everything else", icon: "banknote", color: "#64748b", amt: restAmt, rest: true });
   const gap = segs.length > 1 ? 0.012 : 0;
   let acc = 0;
   let arcs = "";
@@ -769,7 +770,7 @@ function renderInsights() {
   const legendHTML = segs
     .map(
       (s) => `
-    <button class="leg" data-leg="${esc(s.name)}">
+    <button class="leg" data-leg="${s.rest ? "__rest__" : esc(s.name)}">
       <span class="leg-dot" style="background:${s.color}"></span>
       <span class="leg-name">${esc(s.name)}</span>
       <span class="leg-amt">${esc(fmt(s.amt))}</span>
@@ -1211,7 +1212,7 @@ document.addEventListener("click", (e) => {
   }
   /* legend tap → filter history */
   if (t.dataset.leg) {
-    filterCat = t.dataset.leg === "other" ? null : t.dataset.leg;
+    filterCat = t.dataset.leg === "__rest__" ? null : t.dataset.leg;
     renderFilters();
     renderHistory();
     document.querySelector(".history").scrollIntoView({ behavior: "smooth", block: "start" });
