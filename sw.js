@@ -1,6 +1,6 @@
 /* Fluus service worker — offline-first app shell */
 
-const CACHE = "fluus-v13";
+const CACHE = "fluus-v14";
 
 const SHELL = [
   ".",
